@@ -494,6 +494,36 @@
                 this.IP_API_URL = 'https://ipinfo.io/json?token=0cf760b1a45a05';
                 this.refreshInterval = 600000;
                 this.cache = new Map();
+                
+                this.stateAbbreviations = {
+                    'Acre': 'AC',
+                    'Alagoas': 'AL',
+                    'Amapá': 'AP',
+                    'Amazonas': 'AM',
+                    'Bahia': 'BA',
+                    'Ceará': 'CE',
+                    'Distrito Federal': 'DF',
+                    'Espírito Santo': 'ES',
+                    'Goiás': 'GO',
+                    'Maranhão': 'MA',
+                    'Mato Grosso': 'MT',
+                    'Mato Grosso do Sul': 'MS',
+                    'Minas Gerais': 'MG',
+                    'Pará': 'PA',
+                    'Paraíba': 'PB',
+                    'Paraná': 'PR',
+                    'Pernambuco': 'PE',
+                    'Piauí': 'PI',
+                    'Rio de Janeiro': 'RJ',
+                    'Rio Grande do Norte': 'RN',
+                    'Rio Grande do Sul': 'RS',
+                    'Rondônia': 'RO',
+                    'Roraima': 'RR',
+                    'Santa Catarina': 'SC',
+                    'São Paulo': 'SP',
+                    'Sergipe': 'SE',
+                    'Tocantins': 'TO'
+                };
             }
 
             async init() {
@@ -558,11 +588,13 @@
                         addressdetails: 1
                     });
                     
-                    const displayName = [
+                    const parts = [
                         location.address?.suburb || location.address?.neighbourhood,
                         location.address?.city || location.address?.town,
-                        location.address?.state
-                    ].filter(Boolean).join(', ') || 'Localização desconhecida';
+                        this.stateAbbreviations[location.address?.state] || location.address?.state
+                    ].filter(Boolean);
+
+                    const displayName = parts.join(', ') || 'Localização desconhecida';
 
                     const warningElement = document.getElementById('locationWarning');
                     warningElement.textContent = '';
@@ -579,6 +611,7 @@
                         this.fetchData(this.API_URL, {
                             latitude: lat,
                             longitude: lon,
+                            timezone: 'auto',
                             current_weather: true,
                             hourly: 'relativehumidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,uv_index',
                             daily: 'weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max'
@@ -607,6 +640,23 @@
                 return data;
             }
 
+            getWeatherIcon(code, isDay) {
+                const iconMap = {
+                    0: isDay ? 'wi-day-sunny' : 'wi-night-clear',
+                    1: isDay ? 'wi-day-cloudy' : 'wi-night-alt-cloudy',
+                    2: isDay ? 'wi-day-cloudy-high' : 'wi-night-alt-cloudy-high',
+                    3: 'wi-cloudy',
+                    45: 'wi-fog',
+                    51: isDay ? 'wi-day-showers' : 'wi-night-showers',
+                    61: isDay ? 'wi-day-rain' : 'wi-night-rain',
+                    80: isDay ? 'wi-day-storm-showers' : 'wi-night-storm-showers',
+                    95: 'wi-thunderstorm',
+                    96: 'wi-storm-showers',
+                    99: 'wi-lightning'
+                };
+                return iconMap[code] || 'wi-na';
+            }
+
             updateUI(weather, airQuality) {
                 const current = weather.current_weather;
                 const humidity = weather.hourly.relativehumidity_2m[0];
@@ -616,6 +666,13 @@
                 const uvIndex = weather.hourly.uv_index[0];
                 const uvCategory = this.getUVCategory(uvIndex);
 
+                // Detectar se é dia ou noite
+                const currentTime = new Date();
+                const todaySunrise = new Date(weather.daily.sunrise[0]);
+                const todaySunset = new Date(weather.daily.sunset[0]);
+                const isDay = currentTime >= todaySunrise && currentTime < todaySunset;
+
+                // Atualizar elementos
                 document.getElementById('aqi').innerHTML = `
                     <i class="fas ${this.getAQIIcon(currentAQI)}"></i>
                     <div class="aqi-info">
@@ -650,7 +707,7 @@
                 `;
 
                 document.getElementById('condition').textContent = this.getWeatherCondition(current.weathercode);
-                document.getElementById('weatherIcon').className = `wi weather-icon ${this.getWeatherIcon(current.weathercode)}`;
+                document.getElementById('weatherIcon').className = `wi weather-icon ${this.getWeatherIcon(current.weathercode, isDay)}`;
 
                 document.getElementById('forecastGrid').innerHTML = weather.daily.time
                     .slice(0, 6)
@@ -660,7 +717,7 @@
                                 <div>${new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
                                 <div class="forecast-date">${new Date(date).getDate()}/${new Date(date).getMonth() + 1}</div>
                             </div>
-                            <i class="wi ${this.getWeatherIcon(weather.daily.weathercode[index])}"></i>
+                            <i class="wi ${this.getWeatherIcon(weather.daily.weathercode[index], true)}"></i>
                             <div class="forecast-temps">
                                 <div class="temp-max">Máx.: ${weather.daily.temperature_2m_max[index]}°</div>
                                 <div class="temp-min">Mín.: ${weather.daily.temperature_2m_min[index]}°</div>
@@ -714,18 +771,6 @@
                     99: 'Tempestade severa'
                 };
                 return conditions[code] || 'Condição desconhecida';
-            }
-
-            getWeatherIcon(code) {
-                const icons = {
-                    0: 'wi-day-sunny', 1: 'wi-day-cloudy',
-                    2: 'wi-cloudy', 3: 'wi-fog',
-                    45: 'wi-fog', 51: 'wi-rain',
-                    61: 'wi-showers', 80: 'wi-storm-showers',
-                    95: 'wi-thunderstorm', 96: 'wi-hail',
-                    99: 'wi-lightning'
-                };
-                return icons[code] || 'wi-na';
             }
 
             generateAlerts(data) {
