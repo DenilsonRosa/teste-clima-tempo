@@ -113,6 +113,46 @@
             display: block;
         }
 
+        .location {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .location h1 {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 0 0 0.5rem 0;
+            font-family: var(--font-header);
+        }
+
+        .location-warning {
+            font-size: 0.9em;
+            color: #ff6b6b;
+            margin: 0.5rem auto 1rem;
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: fit-content;
+            font-family: var(--font-mono);
+            display: none;
+            gap: 0.6rem;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .location-warning.show {
+            display: flex;
+        }
+
+        [data-theme="dark"] .location-warning {
+            background: rgba(255, 107, 107, 0.05);
+            border-color: rgba(255, 107, 107, 0.15);
+        }
+
         .weather-card {
             background: var(--card-bg);
             border-radius: var(--border-radius);
@@ -238,6 +278,12 @@
             .feels-like i {
                 font-size: 0.9rem;
             }
+
+            .location-warning {
+                width: 90%;
+                padding: 0.6rem;
+                margin: 0.5rem auto;
+            }
         }
 
         .alerts {
@@ -290,17 +336,6 @@
             font-size: 0.9em;
             display: grid;
             gap: 0.5rem;
-        }
-
-        .location-warning {
-            font-size: 0.9em;
-            color: #ff6b6b;
-            margin-top: 0.5rem;
-            font-family: var(--font-mono);
-        }
-
-        [data-theme="dark"] .location-warning {
-            color: #ff6b6b;
         }
     </style>
 </head>
@@ -505,8 +540,9 @@
                         this.updateWeather(latitude, longitude),
                         this.reverseGeocode(latitude, longitude)
                     ]);
-                    document.getElementById('locationWarning').textContent =
-                        'Localização obtida pelo IP. A temperatura pode não refletir o local exato.';
+                    const warningElement = document.getElementById('locationWarning');
+                    warningElement.textContent = 'Localização obtida pelo IP. A temperatura pode não refletir o local exato.';
+                    warningElement.classList.add('show');
                 } catch (error) {
                     console.error('Erro ao buscar localização por IP:', error);
                     throw error;
@@ -528,6 +564,9 @@
                         location.address?.state
                     ].filter(Boolean).join(', ') || 'Localização desconhecida';
 
+                    const warningElement = document.getElementById('locationWarning');
+                    warningElement.textContent = '';
+                    warningElement.classList.remove('show');
                     document.getElementById('locationText').textContent = displayName;
                 } catch (error) {
                     console.error('Erro na geolocalização:', error);
