@@ -148,6 +148,7 @@
         .logo {
             height: 60px;
             margin-right: 1rem;
+            cursor: pointer; /* Adicionado cursor pointer para indicar interatividade */
         }
 
         .theme-toggle {
@@ -976,6 +977,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             new ThemeManager();
             new WeatherService().init();
+
+            // Refresh ao clicar na logo
+            document.querySelector('.logo').addEventListener('click', () => {
+                location.reload();
+            });
 
             const backToTopBtn = document.getElementById('backToTopBtn');
 
