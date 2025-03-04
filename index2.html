@@ -780,23 +780,45 @@
 
                 document.getElementById('forecastGrid').innerHTML = weather.daily.time
                     .slice(0, 6)
-                    .map((date, index) => `
-                        <div class="forecast-item">
-                            <div class="forecast-day">
-                                <div>${new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
-                                <div class="forecast-date">${new Date(date).getDate()}/${new Date(date).getMonth() + 1}</div>
+                    .map((date, index) => {
+                        const forecastDate = new Date(date);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        forecastDate.setHours(0, 0, 0, 0);
+                        
+                        const diffTime = forecastDate - today;
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                        let dayLabel;
+                        if (diffDays === -1) {
+                            dayLabel = 'Ontem.';
+                        } else if (diffDays === 0) {
+                            dayLabel = 'Hoje.';
+                        } else if (diffDays === 1) {
+                            dayLabel = 'Amanhã.';
+                        } else {
+                            const shortDay = forecastDate.toLocaleDateString('pt-BR', { weekday: 'short' });
+                            dayLabel = `${shortDay}.`;
+                        }
+
+                        return `
+                            <div class="forecast-item">
+                                <div class="forecast-day">
+                                    <div>${dayLabel}</div>
+                                    <div class="forecast-date">${forecastDate.getDate()}/${forecastDate.getMonth() + 1}</div>
+                                </div>
+                                <i class="wi ${this.getWeatherIcon(weather.daily.weathercode[index], true)}"></i>
+                                <div class="forecast-temps">
+                                    <div class="temp-max">Máx.: ${weather.daily.temperature_2m_max[index]}°</div>
+                                    <div class="temp-min">Mín.: ${weather.daily.temperature_2m_min[index]}°</div>
+                                </div>
+                                <div class="precipitation-info">
+                                    <div>Prob. Chuva: ${weather.daily.precipitation_probability_max[index]}%</div>
+                                    <div>Total: ${weather.daily.precipitation_sum[index]}mm</div>
+                                </div>
                             </div>
-                            <i class="wi ${this.getWeatherIcon(weather.daily.weathercode[index], true)}"></i>
-                            <div class="forecast-temps">
-                                <div class="temp-max">Máx.: ${weather.daily.temperature_2m_max[index]}°</div>
-                                <div class="temp-min">Mín.: ${weather.daily.temperature_2m_min[index]}°</div>
-                            </div>
-                            <div class="precipitation-info">
-                                <div>Prob. Chuva: ${weather.daily.precipitation_probability_max[index]}%</div>
-                                <div>Total: ${weather.daily.precipitation_sum[index]}mm</div>
-                            </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
             }
 
             getAQICategory(aqi) {
