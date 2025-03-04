@@ -797,9 +797,10 @@
                         } else if (diffDays === 1) {
                             dayLabel = 'Amanhã';
                         } else {
-                            const shortDay = forecastDate.toLocaleDateString('pt-BR', { weekday: 'short' })
-                                .replace('.', '') + '.';
-                            dayLabel = `${shortDay}`;
+                            const rawDay = forecastDate.toLocaleDateString('pt-BR', { weekday: 'short' });
+                            const dayWithoutDot = rawDay.replace('.', '');
+                            const capitalizedDay = dayWithoutDot.charAt(0).toUpperCase() + dayWithoutDot.slice(1);
+                            dayLabel = `${capitalizedDay}.`;
                         }
 
                         return `
