@@ -40,8 +40,12 @@
             --accent-color: #64ffda;
         }
 
-        /* Remover outlines de foco */
-        button:focus {
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:focus,
+        .logo:focus {
             outline: none !important;
             box-shadow: none !important;
         }
@@ -50,8 +54,6 @@
             height: 60px;
             margin-right: 1rem;
             cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
@@ -177,6 +179,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
         }
 
         .theme-icon {
@@ -441,9 +447,8 @@
             color: var(--card-bg);
         }
 
-        #backToTopBtn:focus {
-            outline: none;
-            box-shadow: var(--shadow);
+        #backToTopBtn:active {
+            transform: scale(0.9);
         }
 
         .footer {
