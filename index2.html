@@ -791,14 +791,15 @@
 
                         let dayLabel;
                         if (diffDays === -1) {
-                            dayLabel = 'Ontem.';
+                            dayLabel = 'Ontem';
                         } else if (diffDays === 0) {
-                            dayLabel = 'Hoje.';
+                            dayLabel = 'Hoje';
                         } else if (diffDays === 1) {
-                            dayLabel = 'Amanhã.';
+                            dayLabel = 'Amanhã';
                         } else {
-                            const shortDay = forecastDate.toLocaleDateString('pt-BR', { weekday: 'short' });
-                            dayLabel = `${shortDay}.`;
+                            const shortDay = forecastDate.toLocaleDateString('pt-BR', { weekday: 'short' })
+                                .replace('.', '') + '.';
+                            dayLabel = `${shortDay}`;
                         }
 
                         return `
