@@ -403,7 +403,7 @@
         }
 
         #backToTopBtn {
-            display: none; /* Inicialmente invisível */
+            display: none;
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -427,6 +427,11 @@
         #backToTopBtn:hover {
             background-color: var(--text-color);
             color: var(--card-bg);
+        }
+
+        #backToTopBtn:focus {
+            outline: none;
+            box-shadow: var(--shadow);
         }
 
         @media (max-width: 768px) {
@@ -974,22 +979,19 @@
 
             const backToTopBtn = document.getElementById('backToTopBtn');
 
-            // Função para verificar a rolagem da página
             function toggleBackToTopButton() {
-                if (window.scrollY > 20) { // Se a página for rolada mais de 20 pixels
-                    backToTopBtn.style.display = 'flex'; // Mostra o botão
+                if (window.scrollY > 20) {
+                    backToTopBtn.style.display = 'flex';
+                    backToTopBtn.style.backgroundColor = 'var(--accent-color)';
+                    backToTopBtn.style.color = 'var(--card-bg)';
                 } else {
-                    backToTopBtn.style.display = 'none'; // Esconde o botão
+                    backToTopBtn.style.display = 'none';
                 }
             }
 
-            // Verifica a rolagem ao carregar a página
             toggleBackToTopButton();
-
-            // Verifica a rolagem sempre que o usuário rolar a página
             window.addEventListener('scroll', toggleBackToTopButton);
 
-            // Rolagem suave ao clicar no botão
             backToTopBtn.addEventListener('click', () => {
                 window.scrollTo({
                     top: 0,
