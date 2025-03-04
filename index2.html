@@ -401,6 +401,43 @@
             display: grid;
             gap: 0.5rem;
         }
+
+        #backToTopBtn {
+            display: none; /* Inicialmente invisível */
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99;
+            font-size: 1.5rem;
+            border: none;
+            outline: none;
+            background-color: var(--accent-color);
+            color: var(--card-bg);
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #backToTopBtn:hover {
+            background-color: var(--text-color);
+            color: var(--card-bg);
+        }
+
+        @media (max-width: 768px) {
+            #backToTopBtn {
+                bottom: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -477,6 +514,10 @@
             </div>
         </main>
     </div>
+
+    <button id="backToTopBtn" title="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <script>
         class ThemeManager {
@@ -930,6 +971,31 @@
         document.addEventListener('DOMContentLoaded', () => {
             new ThemeManager();
             new WeatherService().init();
+
+            const backToTopBtn = document.getElementById('backToTopBtn');
+
+            // Função para verificar a rolagem da página
+            function toggleBackToTopButton() {
+                if (window.scrollY > 20) { // Se a página for rolada mais de 20 pixels
+                    backToTopBtn.style.display = 'flex'; // Mostra o botão
+                } else {
+                    backToTopBtn.style.display = 'none'; // Esconde o botão
+                }
+            }
+
+            // Verifica a rolagem ao carregar a página
+            toggleBackToTopButton();
+
+            // Verifica a rolagem sempre que o usuário rolar a página
+            window.addEventListener('scroll', toggleBackToTopButton);
+
+            // Rolagem suave ao clicar no botão
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 </body>
